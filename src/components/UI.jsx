@@ -5,12 +5,17 @@ import Item from "./Item.jsx";
 import UserSingup from "./SignIn.jsx";
 import listOfItems from "../assets/items.jsx";
 import Inputs from "./Inputs.jsx";
+import Categories from "./Categories.jsx";
 import { UserContext } from "../Contexts/UserContext.jsx";
 
 function UI() {
   //using Fetch, retrieve the items from ther server
   const [items, setItems] = useState([]);
   const { user, setUser } = useContext(UserContext);
+  const [categories, setCategories] = useState([]);
+  const [allComplete, setAllComplete] = useState(false);
+
+  const nameRef = useRef();
 
   const location = useLocation();
   const [paramValue, setParamValue] = useState("");
@@ -26,12 +31,20 @@ function UI() {
       .then((response) => response.json())
       .then((data) => {
         setItems(data);
-        console.log(data);
       })
       .catch((err) => {
         console.log("error in fetch get request", err);
       });
-  }, []);
+
+    fetch("/categories")
+      .then((response) => response.json())
+      .then((data) => {
+        setCategories(data);
+      })
+      .catch((err) => {
+        console.log("error in fetch get request", err);
+      });
+  }, [allComplete]);
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -46,6 +59,7 @@ function UI() {
       description: description,
       complete: false,
       starred: false,
+      owner: user,
     };
     setItems([...items, newItem]);
     axios
@@ -73,6 +87,7 @@ function UI() {
     setItems,
     addItem,
     enterPress,
+    nameRef,
   };
 
   const [userName, setUserName] = useState("");
@@ -101,23 +116,49 @@ function UI() {
     );
     setUser("");
   };
+
+  const uncheck = async () => {
+    try {
+      const response = await axios.post(`/items/uncheck`);
+      console.log("response from axios post request", response.data);
+      //jquery select all checkbox inpus and set to false
+      const checkboxes = document.querySelectorAll("input[type=checkbox]");
+      checkboxes.forEach((checkbox) => {
+        checkbox.checked = false;
+      });
+
+      // handle the response data as needed
+    } catch (error) {
+      console.error("error in axios post request", error);
+      // handle the error as needed
+    }
+  };
   return (
     <div>
       <h1 style={style.header}>CampingList</h1>
-      <UserSingup seUser={setUser} user={user} />
-      <div style={style.list}>
-        {items.map((item) => (
-          <Item
-            key={item.name}
-            name={item.name}
-            description={item.description}
-            complete={item.complete}
-            starred={item.starred}
-            setItems={setItems}
-            // updateStar={updateStar}
-          />
-        ))}
+      <UserSingup setUser={setUser} user={user} />
+      <div style={{ textAlign: "center" }}>
+        <Categories categories={categories} />
       </div>
+      <div style={style.list}>
+        {items
+          .filter((item) => {
+            return item.owner === user;
+          })
+          .map((item) => (
+            <Item
+              key={item.name}
+              name={item.name}
+              description={item.description}
+              complete={item.complete}
+              starred={item.starred}
+              setItems={setItems}
+
+              // updateStar={updateStar}
+            />
+          ))}
+      </div>
+      <button onClick={uncheck}>Uncheck All</button>
       {items != [] && <Inputs {...inputProps} />}
     </div>
   );

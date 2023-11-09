@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect } from "react";
 import { UserContext } from "../Contexts/UserContext.jsx";
 import { useLocation } from "react-router-dom";
 
-const SignIn = () => {
+const UserSignup = () => {
   const { user, setUser } = useContext(UserContext);
 
   const location = useLocation();
@@ -70,7 +70,7 @@ const SignIn = () => {
   );
 };
 
-export default SignIn;
+export default UserSignup;
 
 /* {user ? (
   <>

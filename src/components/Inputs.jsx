@@ -1,15 +1,15 @@
 import React, { useState, useRef } from "react";
 
-const Inputs = ({ items, setItems, addItem }) => {
-  const nameRef = useRef(null);
+const Inputs = ({ items, setItems, addItem, nameRef }) => {
+  // const nameRef = useRef(null);
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
 
   const enterPress = (e) => {
-    console.log(items);
-    console.log(name, description, items, setItems);
     if (e.key === "Enter") {
+      console.log(items);
+      console.log(name, description, items, setItems);
       addItem(name, description, items, setItems);
       setName("");
     }
