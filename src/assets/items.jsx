@@ -25,4 +25,4 @@ const items = [
   },
 ];
 
-export default items;
+module.exports = items;
