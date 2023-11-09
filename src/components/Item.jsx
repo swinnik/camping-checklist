@@ -51,6 +51,7 @@ function Item({ name, description, complete, starred, updateStar, setItems }) {
       return !oldComplete;
     });
   }
+
   const sayName = () => {
     console.log(name);
   };

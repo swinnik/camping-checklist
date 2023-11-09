@@ -24,9 +24,21 @@ app.post("/items", (req, res) => {
   res.status(201).json(newItem);
 });
 
+//rewrite .getItems to utilize query params like this: http://localhost:3000/?userName=Bob
+//if no  params, return all items
 app.get("/items", (req, res) => {
-  res.json(items);
+  const userName = req.query.userName;
+  if (userName) {
+    const userItems = items.filter((item) => item.userName === userName);
+    res.json(userItems);
+  } else {
+    res.json(items);
+  }
 });
+
+// app.get("/items", (req, res) => {
+//   res.json(items);
+// });
 
 app.get("/items/:name", (req, res) => {
   const name = req.params.name;

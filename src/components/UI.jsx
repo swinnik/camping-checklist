@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect, useContext } from "react";
+import { useLocation } from "react-router-dom";
 import axios from "axios";
 import Item from "./Item.jsx";
+import UserSingup from "./SignIn.jsx";
 import listOfItems from "../assets/items.jsx";
 import Inputs from "./Inputs.jsx";
 import { UserContext } from "../Contexts/UserContext.jsx";
@@ -9,6 +11,15 @@ function UI() {
   //using Fetch, retrieve the items from ther server
   const [items, setItems] = useState([]);
   const { user, setUser } = useContext(UserContext);
+
+  const location = useLocation();
+  const [paramValue, setParamValue] = useState("");
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const paramValue = params.get("name");
+    setParamValue(paramValue);
+  }, [location]);
 
   useEffect(() => {
     fetch("/items")
@@ -51,32 +62,9 @@ function UI() {
     nameRef.current.focus();
   }
 
-  // async function updateStar(e) {
-  //   const name = e.target.parentElement.parentElement.children[1].innerText;
-  //   console.log(name);
-
-  //   axios
-  //     .patch(`/items/${name}/starred`)
-  //     .then((response) => {
-  //       console.log("response from axios patch request", response);
-  //     })
-  //     .catch((err) => {
-  //       console.log("error in axios patch request", err);
-  //     });
-
-  //   setItems((oldItems) => {
-  //     return oldItems.map((item) => {
-  //       if (item.name === name) {
-  //         return { ...item, starred: !item.starred };
-  //       }
-  //       return item;
-  //     });
-  //   });
-  // }
-
   const enterPress = (e) => {
     if (e.key === "Enter") {
-      addItem(name, description, items, setItems);
+      SignIn();
     }
   };
 
@@ -87,9 +75,36 @@ function UI() {
     enterPress,
   };
 
+  const [userName, setUserName] = useState("");
+
+  const SignIn = () => {
+    if (userName) {
+      const searchParams = new URLSearchParams(window.location.search);
+      searchParams.set("userName", userName);
+      window.history.replaceState(
+        null,
+        "",
+        `${window.location.pathname}?${searchParams.toString()}`
+      );
+      setUser(userName);
+    }
+  };
+
+  const LogOut = () => {
+    //please implement a way to remove the userName search parameter from the url
+    const searchParams = new URLSearchParams(window.location.search);
+    searchParams.delete("userName");
+    window.history.replaceState(
+      null,
+      "",
+      `${window.location.pathname}?${searchParams.toString()}`
+    );
+    setUser("");
+  };
   return (
     <div>
       <h1 style={style.header}>CampingList</h1>
+      <UserSingup seUser={setUser} user={user} />
       <div style={style.list}>
         {items.map((item) => (
           <Item
